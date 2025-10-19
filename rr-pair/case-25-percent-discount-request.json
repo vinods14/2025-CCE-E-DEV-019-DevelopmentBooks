@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "bookId": 1, "quantity": 1 },
+    { "bookId": 2, "quantity": 1 },
+    { "bookId": 3, "quantity": 1 },
+    { "bookId": 4, "quantity": 1 },
+    { "bookId": 5, "quantity": 1 }
+  ]
+}

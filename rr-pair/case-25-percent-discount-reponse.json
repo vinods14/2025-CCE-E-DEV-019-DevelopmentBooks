@@ -1,0 +1,10 @@
+{
+  "total": 187.5,
+  "groups": [
+    {
+      "differentBooks": 5,
+      "discount": "25%",
+      "discountedPrice": 187.5
+    }
+  ]
+}
