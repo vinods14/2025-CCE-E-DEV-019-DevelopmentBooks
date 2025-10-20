@@ -64,7 +64,7 @@ any automated test runner to validate API behavior.
 ##  API Documentation
 
 Once the app is running, you can access the **Swagger UI** at:\
-👉 <http://localhost:8080/swagger-ui.html>
+  <http://localhost:8080/swagger-ui.html>
 
 This provides a visual interface to explore and test API endpoints.
 
@@ -109,7 +109,7 @@ The project uses an **in-memory H2 database** for simplicity and quick
 testing.
 
 You can access the H2 console at:\
-👉 <http://localhost:8080/h2-console>
+  <http://localhost:8080/h2-console>
 
 **Default credentials:** - JDBC URL: `jdbc:h2:mem:bookstore` - Username:
 `sa` - Password: *(empty)*
