@@ -11,19 +11,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Entity
 @Getter
 @Setter
 @Builder
-@Table(name = "BOOK")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Book {
+public class Discount {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String author;
-    private double price;
+    private Integer differentBooks;
+    private Double discountRate;
 }

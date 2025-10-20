@@ -7,12 +7,15 @@ import com.bookstore.application.domain.pojo.GroupSummary;
 import com.bookstore.application.exception.BooksNotFoundException;
 import com.bookstore.application.port.out.LoadBooksPort;
 import com.bookstore.infrastructure.adapter.out.persistence.entity.Book;
+import com.bookstore.infrastructure.adapter.out.persistence.entity.Discount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,17 +23,12 @@ import java.util.stream.Collectors;
 public class BookRepositoryAdapter implements LoadBooksPort {
 
     private static final double BOOK_PRICE = 50.0;
-    private static final Map<Integer, Double> DISCOUNTS = Map.of(
-            1, 0.0,
-            2, 0.05,
-            3, 0.10,
-            4, 0.20,
-            5, 0.25
-    );
     private final BookRepository bookRepository;
+    private final DiscountRepository discountRepository;
 
     @Override
     public List<BookDto> loadAllBooks() {
+
         List<Book> books = bookRepository.findAll();
         if (books.isEmpty()) {
             throw new BooksNotFoundException("Books not found");
@@ -38,20 +36,27 @@ public class BookRepositoryAdapter implements LoadBooksPort {
         return books
                 .stream()
                 .map(this::mapToBookDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public BasketResponse getBasketPrice(Map<Long, Integer> basket) {
-        List<Integer> bookCounts = new ArrayList<>(basket.values());
+
         double totalPrice = 0.0;
+        List<Integer> bookCounts = new ArrayList<>(basket.values());
         List<GroupSummary> groups = new ArrayList<>();
 
         while (bookCounts.stream().anyMatch(count -> count > 0)) {
-            int distinctBooks = (int) bookCounts.stream().filter(c -> c > 0).count();
-            if (distinctBooks > 5) distinctBooks = 5;
+            int distinctBooks = (int) bookCounts
+                    .stream()
+                    .filter(count -> count > 0)
+                    .count();
 
-            double discount = DISCOUNTS.get(distinctBooks);
+            if (distinctBooks > 5) {
+                distinctBooks = 5;
+            }
+
+            double discount = getDiscounts().get(distinctBooks);
             double groupPrice = distinctBooks * BOOK_PRICE * (1 - discount);
             totalPrice += groupPrice;
 
@@ -84,6 +89,19 @@ public class BookRepositoryAdapter implements LoadBooksPort {
             groups.add(GroupSummary.builder().differentBooks(4).discount("20%").discountedPrice(160.0).build());
         }
         return BasketResponse.builder().total(totalPrice).groups(groups).build();
+    }
+
+    private Map<Integer, Double> getDiscounts() {
+
+        List<Discount> discounts = discountRepository.findAll();
+        if (!discounts.isEmpty()) {
+            return discounts.stream()
+                    .collect(Collectors.toMap(
+                            Discount::getDifferentBooks,
+                            Discount::getDiscountRate
+                    ));
+        }
+        return Collections.emptyMap();
     }
 
     private BookDto mapToBookDto(Book book) {

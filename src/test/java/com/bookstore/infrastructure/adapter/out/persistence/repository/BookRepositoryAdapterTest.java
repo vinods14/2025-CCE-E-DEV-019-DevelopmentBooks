@@ -5,6 +5,7 @@ import com.bookstore.application.domain.pojo.BookDto;
 import com.bookstore.application.domain.pojo.GroupSummary;
 import com.bookstore.application.exception.BooksNotFoundException;
 import com.bookstore.infrastructure.adapter.out.persistence.entity.Book;
+import com.bookstore.infrastructure.adapter.out.persistence.entity.Discount;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +28,15 @@ class BookRepositoryAdapterTest {
     @Mock
     private BookRepository bookRepository;
 
+    @Mock
+    private DiscountRepository discountRepository;
+
     @InjectMocks
     private BookRepositoryAdapter adapter;
 
     private List<Book> mockBooks;
+
+    private List<Discount> mockDiscounts;
 
     @BeforeEach
     void setup() {
@@ -40,6 +46,14 @@ class BookRepositoryAdapterTest {
                 new Book(3L, "Clean Architecture", "Robert C. Martin", 50.0),
                 new Book(4L, "TDD by Example", "Kent Beck", 50.0),
                 new Book(5L, "Working Effectively with Legacy Code", "Michael Feathers", 50.0)
+        );
+
+        mockDiscounts = List.of(
+                Discount.builder().differentBooks(1).discountRate(0.0).build(),
+                Discount.builder().differentBooks(2).discountRate(0.05).build(),
+                Discount.builder().differentBooks(3).discountRate(0.10).build(),
+                Discount.builder().differentBooks(4).discountRate(0.20).build(),
+                Discount.builder().differentBooks(5).discountRate(0.25).build()
         );
     }
 
@@ -77,7 +91,7 @@ class BookRepositoryAdapterTest {
                 4L, 1,
                 5L, 1
         );
-
+        when(discountRepository.findAll()).thenReturn(mockDiscounts);
         BasketResponse response = adapter.getBasketPrice(basket);
 
         assertThat(response).isNotNull();
@@ -102,7 +116,7 @@ class BookRepositoryAdapterTest {
                 4L, 1,
                 5L, 1
         );
-
+        when(discountRepository.findAll()).thenReturn(mockDiscounts);
         BasketResponse response = adapter.getBasketPrice(basket);
 
         assertThat(response.getTotal()).isEqualTo(187.5);
@@ -122,7 +136,7 @@ class BookRepositoryAdapterTest {
     @DisplayName("getBasketPrice() should handle duplicate-only basket with no discounts")
     void testGetBasketPrice_duplicatesOnly() {
         Map<Long, Integer> basket = Map.of(1L, 3);
-
+        when(discountRepository.findAll()).thenReturn(mockDiscounts);
         BasketResponse response = adapter.getBasketPrice(basket);
 
         assertThat(response.getTotal()).isEqualTo(150.0);
@@ -143,7 +157,7 @@ class BookRepositoryAdapterTest {
                 4L, 1,
                 5L, 1
         );
-
+        when(discountRepository.findAll()).thenReturn(mockDiscounts);
         BasketResponse response = adapter.getBasketPrice(basket);
 
         assertThat(response.getGroups()).hasSize(2);

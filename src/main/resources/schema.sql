@@ -1,5 +1,13 @@
+DROP TABLE IF EXISTS discount;
+CREATE TABLE discount (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    different_books INT NOT NULL,
+    discount_rate DOUBLE
+);
+
 -- Drop table if it already exists
 DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS book;
 
 -- Create table again
 CREATE TABLE books (
