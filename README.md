@@ -115,7 +115,7 @@ You can access the H2 console at:\
 `sa` - Password: *(empty)*
 
 
-## 🏗️ Project Structure
+##  Project Structure
 
     book-store/
     ├── src/
